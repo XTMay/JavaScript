@@ -42,7 +42,7 @@ Welcome to the official GitHub repository for **“From Concepts to Code”** �
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/your-username/js-practical-course.git
+   git clone [https://github.com/your-username/js-practical-course.git](https://github.com/XTMay/JavaScript.git)
 
 	2.	Navigate to the lessons/ folder to find code and guided exercises.
 	3.	Try fixing bugs in the sample code and submit improvements.
