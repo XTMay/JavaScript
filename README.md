@@ -51,6 +51,7 @@ Welcome to the official GitHub repository for **“From Concepts to Code”** �
 💡 Special Focus: Debugging Confidence
 
 This course is more than just coding — it’s about learning how to:
+
 	•	Read error messages with confidence
 	•	Use console.log() and the browser debugger effectively
 	•	Isolate logic errors and broken assumptions
