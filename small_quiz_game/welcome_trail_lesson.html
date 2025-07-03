@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JavaScript Quiz App - Learning Functions, Loops & Arrays</title>
+  <style>
+    /* Basic styling for clean, centered UI */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .quiz-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    
+    .question {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #34495e;
+      font-weight: bold;
+    }
+    
+    input[type="text"] {
+      width: 80%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #3498db;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+    
+    button {
+      background-color: #3498db;
+      color: white;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    
+    button:hover {
+      background-color: #2980b9;
+    }
+    
+    .score-display {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e8f5e8;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #27ae60;
+    }
+    
+    .progress {
+      margin-bottom: 20px;
+      color: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>🧠 JavaScript Quiz Challenge</h1>
+    <div class="progress" id="progress">Question 1 of 2</div>
+    
+    <!-- Quiz question display area -->
+    <div class="question" id="questionText">Loading question...</div>
+    
+    <!-- User input area -->
+    <input type="text" id="answerInput" placeholder="Type your answer here..." />
+    <br>
+    <button onclick="submitAnswer()">Submit Answer</button>
+    <button onclick="restartQuiz()" style="background-color: #95a5a6;">Restart Quiz</button>
+    
+    <!-- Score display area (hidden initially) -->
+    <div class="score-display" id="scoreDisplay" style="display: none;"></div>
+  </div>
+
+  <script>
+    // ARRAYS: Store quiz questions and correct answers
+    // This array contains objects with question text and correct answer
+    // [{}, {}, {}], {}, "", Datatime, int, float, boolean
+    // {}: key: value
+    // get the second question in the list/array
+    const quizQuestions = [
+      {
+        question: "What does 'JS' stand for in web development?",
+        correctAnswer: "javascript"
+      },
+      {
+        question: "Which symbol is used to declare a variable in modern JavaScript?",
+        correctAnswer: "let"
+      },
+      {
+        question: "What method is used to display text in the browser console?",
+        correctAnswer: "console.log"
+      },
+      {
+        question: "Which HTML tag is used to include JavaScript code?",
+        correctAnswer: "script"
+      },
+      {
+        question: "What symbol is used to access an element by its ID in JavaScript?",
+        correctAnswer: "getElementById"
+      },
+      {
+        question: "Which keyword is used to create a function in JavaScript?",
+        correctAnswer: "function"
+      },
+      {
+        question: "What data type is used to store true or false values?",
+        correctAnswer: "boolean"
+      },
+      {
+        question: "Which loop is commonly used to iterate through arrays?",
+        correctAnswer: "for"
+      }
+    ];
+    
+    // Variables to track quiz state
+    let currentQuestionIndex = 0;  // Tracks which question we're on
+    let userScore = 0;             // Tracks user's correct answers
+    let userAnswers = [];          // Array to store all user responses
+    
+    // FUNCTION: Initialize and start the quiz
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      userScore = 0;
+      userAnswers = [];  // Reset answers array
+
+      document.getElementById('scoreDisplay').style.display = 'none';
+
+      showCurrentQuestion(); // calling other function
+    }
+    
+    // FUNCTION: Display the current question using array indexing
+    function showCurrentQuestion() {
+      // Check if we have more questions to show
+      if (currentQuestionIndex < quizQuestions.length) {
+        // Access question from array using current index
+        const currentQuestion = quizQuestions[currentQuestionIndex];
+        
+        // Update the HTML elements with current question data
+        document.getElementById('questionText').innerText = currentQuestion.question;
+        document.getElementById('progress').innerText = 
+          `Question ${currentQuestionIndex + 1} of ${quizQuestions.length}`;
+        
+        // Clear the input field for new answer
+        document.getElementById('answerInput').value = '';
+        document.getElementById('answerInput').focus(); // Auto-focus for better UX
+      } else {
+        // No more questions - show final results
+        showFinalScore();
+      }
+    }
+    
+    // FUNCTION: Handle user answer submission
+    function submitAnswer() {
+      // Capture user input from the text field
+      const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
+      
+      // Validate that user entered something
+      if (userAnswer === '') {
+        alert('Please enter an answer before submitting!');
+        return; // Exit function early if no answer
+      }
+      
+      // Get the correct answer for current question
+      const correctAnswer = quizQuestions[currentQuestionIndex].correctAnswer.toLowerCase();
+      
+      // Store user's answer in our answers array
+      userAnswers.push(userAnswer);
+      
+      // Check if answer is correct and update score
+      if (userAnswer === correctAnswer) {
+        userScore++; // Increment score for correct answer
+        alert('✅ Correct! Well done!');
+      } else {
+        alert(`❌ Incorrect. The correct answer was: ${correctAnswer}`);
+      }
+      
+      // Move to next question
+      currentQuestionIndex++;
+      
+      // Show next question or final results
+      showCurrentQuestion();
+    }
+    
+    // FUNCTION: Display final quiz results
+    function showFinalScore() {
+      // Hide question elements
+      document.getElementById('questionText').style.display = 'none';
+      document.getElementById('answerInput').style.display = 'none';
+      document.querySelector('button[onclick="submitAnswer()"]').style.display = 'none';
+      document.getElementById('progress').style.display = 'none';
+      
+      // Calculate percentage score
+      const percentage = Math.round((userScore / quizQuestions.length) * 100);
+      
+      // Create detailed results message
+      let resultsMessage = `🎉 Quiz Complete!\n\n`;
+      resultsMessage += `Final Score: ${userScore} out of ${quizQuestions.length} (${percentage}%)\n\n`;
+      
+      // LOOP: Show review of all questions and answers
+      resultsMessage += "📝 Answer Review:\n";
+      for (let i = 0; i < quizQuestions.length; i++) {
+        const question = quizQuestions[i];
+        const userAnswer = userAnswers[i];
+        const isCorrect = userAnswer === question.correctAnswer.toLowerCase();
+        
+        resultsMessage += `Q${i + 1}: ${question.question}\n`;
+        resultsMessage += `Your answer: ${userAnswer} ${isCorrect ? '✅' : '❌'}\n`;
+        if (!isCorrect) {
+          resultsMessage += `Correct answer: ${question.correctAnswer}\n`;
+        }
+        resultsMessage += '\n';
+      }
+      
+      // Show results in alert AND on page
+      alert(resultsMessage);
+      
+      // Display score on the page as well
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      scoreDisplay.innerHTML = `
+        <h2>🎉 Quiz Complete!</h2>
+        <p>Your Score: <strong>${userScore} / ${quizQuestions.length}</strong></p>
+        <p>Percentage: <strong>${percentage}%</strong></p>
+        <p>${percentage >= 70 ? 'Great job! 🌟' : 'Keep practicing! 💪'}</p>
+      `;
+      scoreDisplay.style.display = 'block';
+    }
+    
+    // FUNCTION: Restart the entire quiz
+    function restartQuiz() {
+      // Reset all display elements to initial state
+      document.getElementById('questionText').style.display = 'block';
+      document.getElementById('answerInput').style.display = 'block';
+      document.querySelector('button[onclick="submitAnswer()"]').style.display = 'inline-block';
+      document.getElementById('progress').style.display = 'block';
+      
+      // Restart the quiz from beginning
+      startQuiz();
+    }
+    
+    // EVENT LISTENER: Allow Enter key to submit answers
+    document.getElementById('answerInput').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        submitAnswer(); // Call submit function when Enter is pressed
+      }
+    });
+    
+    // AUTO-START: Begin quiz when page loads
+    // This ensures the quiz starts immediately when the page opens
+    window.onload = function() {
+      startQuiz();
+    };
+    
+    /*
+    📚 EDUCATIONAL SUMMARY FOR STUDENTS:
+    
+    🔸 ARRAYS: We use 'quizQuestions' array to store all our quiz data.
+       Each element is an object containing question and answer.
+       We also use 'userAnswers' array to track all user responses.
+    
+    🔸 LOOPS: The 'for' loop in showFinalScore() iterates through all questions
+       to create a detailed review of answers. Loop counter 'i' accesses each
+       array element by index.
+    
+    🔸 FUNCTIONS: Each major action is organized into functions:
+       - startQuiz(): Initializes quiz state
+       - showCurrentQuestion(): Displays questions using array indexing
+       - submitAnswer(): Captures input, validates, and scores answers
+       - showFinalScore(): Calculates and displays final results
+       - restartQuiz(): Resets everything to start over
+    
+    🔸 USER INPUT: document.getElementById('answerInput').value captures
+       what the user types. We use .trim() and .toLowerCase() to clean
+       the input for fair comparison.
+    
+    🔸 DYNAMIC HTML: Functions modify the webpage content in real-time
+       using innerHTML and innerText to update questions, scores, and visibility.
+    */
+  </script>
+</body>
+</html>
