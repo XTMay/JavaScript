@@ -137,7 +137,6 @@ This assignment reinforces:
 Good luck with your debugging adventure! 🚀
 
 
-```markdown:%2FUsers%2Fxiaotingzhou%2FDocuments%2FLectures%2FJavascript%2FJavaScript%2Fhomework_word_guessing_debug%2FREADME.md
 # Word Guessing Game - Homework Debug Challenge
 
 ## 📖 Overview
