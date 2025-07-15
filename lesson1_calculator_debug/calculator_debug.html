@@ -158,29 +158,29 @@
         <!-- Row 1 -->
         <button class="clear" onclick="clearDisplay()">C</button>
         <button class="clear" onclick="deleteLast()">⌫</button>
-        <button class="operator" onclick="appendToDisplay('/')">/</button>
-        <button class="operator" onclick="appendToDisplay('*')">×</button>
+        <button class="operator" onclick="handleOperator('/')">/</button>
+        <button class="operator" onclick="handleOperator('*')">×</button>
         
         <!-- Row 2 -->
         <button class="number" onclick="appendToDisplay('7')">7</button>
         <button class="number" onclick="appendToDisplay('8')">8</button>
         <button class="number" onclick="appendToDisplay('9')">9</button>
-        <button class="operator" onclick="appendToDisplay('-')">-</button>
+        <button class="operator" onclick="handleOperator('-')">-</button>
         
         <!-- Row 3 -->
         <button class="number" onclick="appendToDisplay('4')">4</button>
         <button class="number" onclick="appendToDisplay('5')">5</button>
         <button class="number" onclick="appendToDisplay('6')">6</button>
-        <button class="operator" onclick="appendToDisplay('+')">+</button>
+        <button class="operator" onclick="handleOperator('+')">+</button>
         
         <!-- Row 4 -->
         <button class="number" onclick="appendToDisplay('1')">1</button>
         <button class="number" onclick="appendToDisplay('2')">2</button>
         <button class="number" onclick="appendToDisplay('3')">3</button>
-        <button class="equals" onclick="calculateResult()" rowspan="2">=</button>
+        <button class="equals" onclick="appendToDisplay('='), calculateResult()" style="grid-row: span 2">=</button>
         
         <!-- Row 5 -->
-        <button class="number" onclick="appendToDisplay('0')" colspan="2">0</button>
+        <button class="number" onclick="appendToDisplay('0')" style="grid-column: span 2">0</button>
         <button class="number" onclick="appendToDisplay('.')">.</button>
       </div>
     </div>
@@ -198,147 +198,75 @@
   </div>
 
   <script>
-    // INTENTIONAL BUGS FOR DEBUGGING PRACTICE
-    // Students need to find and fix these issues
-    
+    // INTENTIONAL BUGS FOR DEBUGGING PRACTICE - NOW FIXED
     // Global variables to track calculator state
     let currentInput = '';
     let operator = '';
     let previousInput = '';
     let shouldResetDisplay = false;
     
-    // BUG 1: Function name mismatch - function is called 'appendToDisplay' but defined as 'addToDisplay'
-    function addToDisplay(value) {
+    // 🐛 Bug 1 Fixed: Function Name Mismatch
+    function appendToDisplay(value) {
       const display = document.getElementById('display');
       
       if (shouldResetDisplay) {
         display.value = '';
         shouldResetDisplay = false;
+        currentInput = '';
       }
       
-      // BUG 3: No validation for multiple decimal points
-      display.value += value;
-      currentInput = display.value;
+      // 🐛 Bug 3: Multiple Decimal Points
       
-      // Debug logging - students should use console to track values
+      // Build the current number being entered
+      currentInput += value;
+      
+      // Update display based on whether we have an operator
+      if (operator !== '' && previousInput !== '') {
+        display.value = previousInput + operator + currentInput;
+      } else {
+        display.value = currentInput;
+      }
+    
       console.log('Current input:', currentInput);
     }
     
-    // BUG 5: Clear function has wrong variable name
+    // 🐛 Bug 5 Fixed: Clear Button Issues
     function clearDisplay() {
       const display = document.getElementById('display');
-      display.value = '';
+      display.value = '0';
       currentInput = '';
       operator = '';
       previousInput = '';
       shouldResetDisplay = false;
-      
-      // This should clear the display but has a typo
-      wrongVariableName = ''; // This variable doesn't exist
-      
-      console.log('Calculator cleared');
+
+      // define a variable here
+      wrongVariableName = '';
+
+      console.log('Calculator cleared', wrongVariableName);
     }
     
     function deleteLast() {
       const display = document.getElementById('display');
-      display.value = display.value.slice(0, -1);
-      currentInput = display.value;
+      
+      if (currentInput.length > 0) {
+        currentInput = currentInput.slice(0, -1);
+        
+        if (operator !== '' && previousInput !== '') {
+          display.value = previousInput + operator + currentInput;
+        } else {
+          display.value = currentInput || '0';
+        }
+      }
       
       console.log('Deleted last character:', currentInput);
     }
     
-    // BUG 4: Function returns undefined instead of calculating
+    // calculate result
     function calculateResult() {
       const display = document.getElementById('display');
       
       if (currentInput === '' || operator === '' || previousInput === '') {
         console.log('Incomplete calculation');
-        return; // Exit early if calculation is incomplete
-      }
-      
-      let result;
-      const prev = parseFloat(previousInput);
-      const current = parseFloat(currentInput);
-      
-      console.log('Calculating:', prev, operator, current);
-      
-      switch (operator) {
-        case '+':
-          result = prev + current;
-          break;
-        case '-':
-          result = prev - current;
-          break;
-        case '*':
-          result = prev * current;
-          break;
-        case '/':
-          // BUG 2: No check for division by zero
-          result = prev / current;
-          break;
-        default:
-          console.log('Unknown operator:', operator);
-          return;
-      }
-      
-      // BUG 4: Function doesn't return the result or update display
-      console.log('Result:', result);
-      // Missing: display.value = result;
-      // Missing: return result;
-      
-      // Reset for next calculation
-      currentInput = '';
-      operator = '';
-      previousInput = '';
-      shouldResetDisplay = true;
-    }
-    
-    // Function to handle operators
-    function handleOperator(op) {
-      if (currentInput === '') {
-        console.log('No number entered for operator');
-        return;
-      }
-      
-      if (previousInput !== '' && operator !== '' && currentInput !== '') {
-        calculateResult();
-      }
-      
-      operator = op;
-      previousInput = currentInput;
-      currentInput = '';
-      shouldResetDisplay = true;
-      
-      console.log('Operator set:', op, 'Previous:', previousInput);
-    }
-    
-    // Enhanced appendToDisplay function that should replace the buggy one
-    function appendToDisplayFixed(value) {
-      const display = document.getElementById('display');
-      
-      if (shouldResetDisplay) {
-        display.value = '';
-        shouldResetDisplay = false;
-      }
-      
-      // Fix for Bug 3: Prevent multiple decimal points
-      if (value === '.' && display.value.includes('.')) {
-        console.log('Decimal point already exists');
-        return;
-      }
-      
-      display.value += value;
-      currentInput = display.value;
-      
-      console.log('Current input:', currentInput);
-    }
-    
-    // Enhanced calculateResult function that actually works
-    function calculateResultFixed() {
-      const display = document.getElementById('display');
-      
-      if (currentInput === '' || operator === '' || previousInput === '') {
-        console.log('Incomplete calculation');
         return;
       }
       
@@ -359,12 +287,15 @@
           result = prev * current;
           break;
         case '/':
-          // Fix for Bug 2: Check for division by zero
+          // 🐛 Bug 2: Division by Zero: use if to check variable
+          // 6 / 0 ?
+          // 19 / 0?
           if (current === 0) {
             alert('Error: Cannot divide by zero!');
             console.log('Division by zero attempted');
             return;
           }
+          
           result = prev / current;
           break;
         default:
@@ -372,8 +303,7 @@
           return;
       }
       
-      // Fix for Bug 4: Actually update the display and return result
-      display.value = result;
+      // 🐛 Bug 4: Undefined Results
       console.log('Result:', result);
       
       // Reset for next calculation
@@ -381,12 +311,41 @@
       operator = '';
       previousInput = '';
       shouldResetDisplay = true;
-      
+      // Add a innier funtion to show our final result in the webpage
+
+      display.value = result;
       return result;
+    }
+    
+    // Function to handle operators
+    function handleOperator(op) {
+      const display = document.getElementById('display');
+      
+      if (currentInput === '') {
+        console.log('No number entered for operator');
+        return;
+      }
+      
+      // If we already have a complete equation, calculate it first
+      if (previousInput !== '' && operator !== '' && currentInput !== '') {
+        calculateResult();
+        // After calculation, currentInput contains the result
+      }
+      
+      operator = op;
+      previousInput = currentInput;
+      currentInput = '';
+      
+      // Show the equation so far: "6+"
+      display.value = previousInput + op;
+      shouldResetDisplay = false;
+      
+      console.log('Operator set:', op, 'Previous:', previousInput);
     }
     
     // Initialize calculator
     window.onload = function() {
+      document.getElementById('display').value = '0';
       console.log('Calculator loaded - Ready for debugging!');
       console.log('Open Developer Tools (F12) to see debug messages');
       console.log('Try using the calculator and watch for errors in the console');
