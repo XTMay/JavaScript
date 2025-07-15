@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word Guessing Game - Homework Assignment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5dc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .game-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    h1 {
+      color: #8b4513;
+      margin-bottom: 20px;
+    }
+    
+    .word-display {
+      font-size: 32px;
+      font-weight: bold;
+      letter-spacing: 8px;
+      margin: 20px 0;
+      color: #2c3e50;
+      font-family: monospace;
+    }
+    
+    .hint {
+      font-size: 16px;
+      color: #7f8c8d;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    
+    input[type="text"] {
+      width: 60%;
+      padding: 12px;
+      font-size: 18px;
+      border: 2px solid #e67e22;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    
+    button {
+      background-color: #e67e22;
+      color: white;
+      padding: 12px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    
+    button:hover {
+      background-color: #d35400;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #ecf0f1;
+      border-radius: 5px;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #e67e22;
+    }
+    
+    .guessed-letters {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #fdf2e9;
+      border-radius: 5px;
+    }
+    
+    .letter {
+      display: inline-block;
+      margin: 2px;
+      padding: 5px 8px;
+      background-color: #e67e22;
+      color: white;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+    
+    .game-over {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 5px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .win {
+      background-color: #d5f4e6;
+      color: #27ae60;
+    }
+    
+    .lose {
+      background-color: #fadbd8;
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>🎯 Word Guessing Challenge</h1>
+    
+    <!-- Game Stats -->
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-number" id="currentWord">1</div>
+        <div>Word</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="attemptsLeft">6</div>
+        <div>Attempts Left</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="wordsGuessed">0</div>
+        <div>Words Guessed</div>
+      </div>
+    </div>
+    
+    <!-- Word Display -->
+    <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
+    <div class="hint" id="hintDisplay">Loading hint...</div>
+    
+    <!-- User Input -->
+    <input type="text" id="letterInput" placeholder="Enter a letter..." maxlength="1" />
+    <br>
+    <button onclick="guessLetter()">Guess Letter</button>
+    <button onclick="guessWholeWord()" style="background-color: #3498db;">Guess Word</button>
+    <button onclick="nextWord()" style="background-color: #95a5a6;">Skip Word</button>
+    <button onclick="restartGame()" style="background-color: #e74c3c;">Restart Game</button>
+    
+    <!-- Guessed Letters Display -->
+    <div class="guessed-letters">
+      <strong>Guessed Letters:</strong>
+      <div id="guessedLettersDisplay"></div>
+    </div>
+    
+    <!-- Game Over Display -->
+    <div class="game-over" id="gameOverDisplay" style="display: none;"></div>
+  </div>
+
+  <script>
+    /*
+    🐛 DEBUGGING MISSION: Find and Fix 5 Bugs! 🐛
+    
+    This word guessing game has 5 intentional bugs that prevent it from working correctly.
+    Your job is to find and fix them using debugging techniques:
+    
+    1. Open Developer Tools (F12 or right-click → Inspect)
+    2. Check the Console tab for error messages
+    3. Use console.log() to track variable values
+    4. Test each function systematically
+    5. Read error messages carefully
+    
+    🎯 BUGS TO FIND:
+    Bug 1: Function name mismatch - one function is called but defined with different name
+    Bug 2: Array index error - accessing array element incorrectly
+    Bug 3: Variable reference error - using undefined variable name
+    Bug 4: Logic error in win condition check
+    Bug 5: Missing return statement causing undefined behavior
+    
+    💡 DEBUGGING TECHNIQUES TO PRACTICE:
+    - Reading console error messages
+    - Using console.log() to trace execution
+    - Checking variable values at different points
+    - Testing edge cases
+    - Systematic function testing
+    */
+    
+    // ARRAYS: Store word data with hints
+    const wordBank = [
+      { word: "javascript", hint: "Popular programming language for web development" },
+      { word: "function", hint: "Reusable block of code that performs a task" },
+      { word: "variable", hint: "Container that stores data values" },
+      { word: "array", hint: "Data structure that stores multiple values" },
+      { word: "loop", hint: "Code structure that repeats instructions" },
+      { word: "object", hint: "Data type that stores key-value pairs" },
+      { word: "string", hint: "Data type for storing text" },
+      { word: "boolean", hint: "Data type with true or false values" },
+      { word: "element", hint: "Individual item in an HTML document" },
+      { word: "event", hint: "Action that triggers JavaScript code" }
+    ];
+    
+    // Game state variables
+    let currentWordIndex = 0;
+    let currentWord = "";
+    let displayWord = [];
+    let guessedLetters = [];
+    let attemptsRemaining = 6;
+    let wordsCompleted = 0;
+    let gameActive = true;
+    
+    // BUG 1: Function name mismatch - called 'initializeGame' but defined as 'startGame'
+    function startGame() {
+      currentWordIndex = 0;
+      wordsCompleted = 0;
+      loadNewWord();
+    }
+    
+    // FUNCTION: Load a new word from the word bank
+    function loadNewWord() {
+      if (currentWordIndex >= wordBank.length) {
+        showGameComplete();
+        return;
+      }
+      
+      // BUG 2: Array index error - should use currentWordIndex, not currentWordIndex + 1
+      const wordData = wordBank[currentWordIndex + 1];
+      currentWord = wordData.word.toLowerCase();
+      
+      // Reset game state for new word
+      displayWord = [];
+      guessedLetters = [];
+      attemptsRemaining = 6;
+      gameActive = true;
+      
+      // Initialize display word with underscores
+      for (let i = 0; i < currentWord.length; i++) {
+        displayWord.push("_");
+      }
+      
+      // Update display
+      updateDisplay();
+      document.getElementById('hintDisplay').innerText = wordData.hint;
+      document.getElementById('gameOverDisplay').style.display = 'none';
+    }
+    
+    // FUNCTION: Handle letter guessing
+    function guessLetter() {
+      if (!gameActive) return;
+      
+      const input = document.getElementById('letterInput');
+      const letter = input.value.toLowerCase().trim();
+      
+      // Validate input
+      if (letter === '' || letter.length !== 1 || !/[a-z]/.test(letter)) {
+        alert('Please enter a single letter!');
+        return;
+      }
+      
+      // Check if letter already guessed
+      if (guessedLetters.includes(letter)) {
+        alert('You already guessed that letter!');
+        return;
+      }
+      
+      // Add to guessed letters
+      guessedLetters.push(letter);
+      
+      // Check if letter is in the word
+      let letterFound = false;
+      for (let i = 0; i < currentWord.length; i++) {
+        if (currentWord[i] === letter) {
+          displayWord[i] = letter;
+          letterFound = true;
+        }
+      }
+      
+      // BUG 3: Variable reference error - 'foundLetter' is undefined, should be 'letterFound'
+      if (!foundLetter) {
+        attemptsRemaining--;
+      }
+      
+      // Clear input
+      input.value = '';
+      
+      // Update display and check game state
+      updateDisplay();
+      checkGameState();
+    }
+    
+    // FUNCTION: Handle whole word guessing
+    function guessWholeWord() {
+      if (!gameActive) return;
+      
+      const guess = prompt('Enter your guess for the whole word:');
+      if (guess === null) return; // User cancelled
+      
+      if (guess.toLowerCase().trim() === currentWord) {
+        // Correct guess - reveal whole word
+        for (let i = 0; i < currentWord.length; i++) {
+          displayWord[i] = currentWord[i];
+        }
+        updateDisplay();
+        checkGameState();
+      } else {
+        attemptsRemaining--;
+        alert('Incorrect word guess!');
+        updateDisplay();
+        checkGameState();
+      }
+    }
+    
+    // FUNCTION: Update all display elements
+    function updateDisplay() {
+      // Update word display
+      document.getElementById('wordDisplay').innerText = displayWord.join(' ');
+      
+      // Update stats
+      document.getElementById('currentWord').innerText = currentWordIndex + 1;
+      document.getElementById('attemptsLeft').innerText = attemptsRemaining;
+      document.getElementById('wordsGuessed').innerText = wordsCompleted;
+      
+      // Update guessed letters display
+      const lettersHtml = guessedLetters.map(letter => 
+        `<span class="letter">${letter}</span>`
+      ).join('');
+      document.getElementById('guessedLettersDisplay').innerHTML = lettersHtml;
+    }
+    
+    // FUNCTION: Check if game is won or lost
+    function checkGameState() {
+      // BUG 4: Logic error in win condition - should check if NO underscores remain
+      const wordComplete = displayWord.includes('_');
+      
+      if (wordComplete) {
+        // Word completed
+        gameActive = false;
+        wordsCompleted++;
+        document.getElementById('gameOverDisplay').innerHTML = 
+          `<div class="win">🎉 Congratulations! You guessed "${currentWord}"!</div>`;
+        document.getElementById('gameOverDisplay').style.display = 'block';
+      } else if (attemptsRemaining <= 0) {
+        // Game over - no attempts left
+        gameActive = false;
+        document.getElementById('gameOverDisplay').innerHTML = 
+          `<div class="lose">💀 Game Over! The word was "${currentWord}"</div>`;
+        document.getElementById('gameOverDisplay').style.display = 'block';
+      }
+    }
+    
+    // FUNCTION: Move to next word
+    function nextWord() {
+      currentWordIndex++;
+      loadNewWord();
+    }
+    
+    // FUNCTION: Show game completion message
+    function showGameComplete() {
+      document.getElementById('gameOverDisplay').innerHTML = 
+        `<div class="win">🏆 Amazing! You completed all ${wordsCompleted} words!</div>`;
+      document.getElementById('gameOverDisplay').style.display = 'block';
+      gameActive = false;
+    }
+    
+    // FUNCTION: Restart the entire game
+    function restartGame() {
+      // BUG 5: Missing return statement - function should return after calling startGame
+      startGame();
+      // This code should not execute, but it will due to missing return
+      console.log('This should not appear if return statement exists');
+    }
+    
+    // EVENT LISTENER: Allow Enter key to guess letters
+    document.getElementById('letterInput').addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        guessLetter();
+      }
+    });
+    
+    // AUTO-START: Begin game when page loads
+    window.onload = function() {
+      initializeGame(); // This will cause an error due to Bug 1
+    };
+    
+    /*
+    📚 EDUCATIONAL NOTES:
+    
+    🔸 ARRAYS: wordBank stores objects with word and hint properties
+       displayWord array tracks revealed letters
+       guessedLetters array prevents duplicate guesses
+    
+    🔸 LOOPS: for loops iterate through word characters
+       Array methods like includes() and map() provide functional approaches
+    
+    🔸 FUNCTIONS: Game logic is organized into focused functions:
+       - startGame(): Initialize game state
+       - loadNewWord(): Set up new word challenge
+       - guessLetter(): Handle single letter guesses
+       - updateDisplay(): Refresh all UI elements
+       - checkGameState(): Determine win/lose conditions
+    
+    🔸 DEBUGGING SKILLS: This exercise teaches:
+       - Reading console error messages
+       - Tracing function execution
+       - Identifying variable scope issues
+       - Testing logical conditions
+       - Systematic problem solving
+    */
+  </script>
+</body>
+</html>

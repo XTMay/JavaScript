@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Drawing App - Event Handling Debug Challenge</title>
+  <style>
+    /* Modern, clean styling */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    
+    .debug-info {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #856404;
+    }
+    
+    .toolbar {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .tool-group label {
+      font-weight: bold;
+      color: #333;
+    }
+    
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #545b62;
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+    }
+    
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #1e7e34;
+    }
+    
+    input[type="range"] {
+      width: 100px;
+    }
+    
+    input[type="color"] {
+      width: 50px;
+      height: 35px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .canvas-container {
+      border: 3px solid #333;
+      border-radius: 10px;
+      margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      background: white;
+    }
+    
+    #drawingCanvas {
+      border-radius: 7px;
+      cursor: crosshair;
+    }
+    
+    .interaction-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .event-logger {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .event-logger h3 {
+      margin-top: 0;
+      color: #495057;
+    }
+    
+    #eventLog {
+      height: 200px;
+      overflow-y: auto;
+      background: white;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    
+    .keyboard-controls {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .keyboard-controls h3 {
+      margin-top: 0;
+      color: #495057;
+    }
+    
+    .key-info {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 10px;
+      font-size: 14px;
+    }
+    
+    .key-info div {
+      padding: 5px;
+      background: white;
+      border-radius: 3px;
+      border: 1px solid #dee2e6;
+    }
+    
+    .debug-section {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+    }
+    
+    .debug-section h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    
+    .bug-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    
+    .bug-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .bug-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .active-tool {
+      background: #28a745 !important;
+      color: white !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Interactive Drawing App - Event Handling Debug Challenge</h1>
+    
+    <div class="debug-info">
+      <strong>🐛 Debugging Mission:</strong> This drawing app has several event handling bugs! Use browser developer tools to find and fix them.
+    </div>
+    
+    <div class="toolbar">
+      <div class="tool-group">
+        <label>Tools:</label>
+        <button id="penTool" class="btn-primary active-tool" onclick="selectTool('pen')">✏️ Pen</button>
+        <button id="eraserTool" class="btn-secondary" onclick="selectTool('eraser')">🧽 Eraser</button>
+        <button id="lineTool" class="btn-secondary" onclick="selectTool('line')">📏 Line</button>
+        <button id="circleTool" class="btn-secondary" onclick="selectTool('circle')">⭕ Circle</button>
+      </div>
+      
+      <div class="tool-group">
+        <label for="brushSize">Size:</label>
+        <input type="range" id="brushSize" min="1" max="50" value="5" oninput="updateBrushSize()">
+        <span id="sizeDisplay">5px</span>
+      </div>
+      
+      <div class="tool-group">
+        <label for="colorPicker">Color:</label>
+        <input type="color" id="colorPicker" value="#000000" onchange="updateColor()">
+      </div>
+      
+      <div class="tool-group">
+        <button class="btn-danger" onclick="clearCanvas()">🗑️ Clear</button>
+        <button class="btn-success" onclick="saveDrawing()">💾 Save</button>
+        <button class="btn-secondary" onclick="undoLastAction()">↶ Undo</button>
+      </div>
+    </div>
+    
+    <div class="canvas-container">
+      <canvas id="drawingCanvas" width="800" height="400"></canvas>
+    </div>
+    
+    <div class="interaction-panel">
+      <div class="event-logger">
+        <h3>📋 Event Logger</h3>
+        <div id="eventLog"></div>
+        <button class="btn-secondary" onclick="clearEventLog()">Clear Log</button>
+      </div>
+      
+      <div class="keyboard-controls">
+        <h3>⌨️ Keyboard Shortcuts</h3>
+        <div class="key-info">
+          <div><strong>P</strong></div><div>Pen Tool</div>
+          <div><strong>E</strong></div><div>Eraser Tool</div>
+          <div><strong>L</strong></div><div>Line Tool</div>
+          <div><strong>C</strong></div><div>Circle Tool</div>
+          <div><strong>Space</strong></div><div>Clear Canvas</div>
+          <div><strong>Ctrl+Z</strong></div><div>Undo</div>
+        </div>
+        <p><strong>Current Key:</strong> <span id="currentKey">None</span></p>
+      </div>
+    </div>
+    
+    <div class="debug-section">
+      <h3>🔍 Bugs to Find & Fix:</h3>
+      <ul class="bug-list">
+        <li>🐛 <strong>Bug 1:</strong> Mouse events don't work on canvas</li>
+        <li>🐛 <strong>Bug 2:</strong> Keyboard shortcuts not responding</li>
+        <li>🐛 <strong>Bug 3:</strong> Tool selection doesn't update visually</li>
+        <li>🐛 <strong>Bug 4:</strong> Drawing continues when mouse leaves canvas</li>
+        <li>🐛 <strong>Bug 5:</strong> Event logger shows 'undefined' events</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // INTENTIONAL BUGS FOR EVENT HANDLING DEBUGGING
+    
+    // Global variables
+    let canvas, ctx;
+    let isDrawing = false;
+    let currentTool = 'pen';
+    let currentColor = '#000000';
+    let currentSize = 5;
+    let lastX = 0;
+    let lastY = 0;
+    let drawingHistory = [];
+    
+    // BUG 1: Canvas event listeners not properly attached
+    function initializeCanvas() {
+      canvas = document.getElementById('drawingCanvas');
+      ctx = canvas.getContext('2d');
+      
+      // BUG 1: Using wrong event names
+      canvas.addEventListener('mousedown', startDrawing);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDrawing);
+      // Missing: canvas.addEventListener('mouseout', stopDrawing);
+      
+      // BUG 1: Event listeners attached to wrong element
+      document.addEventListener('mousedown', startDrawing); // Should be canvas only
+      
+      console.log('Canvas initialized');
+    }
+    
+    // BUG 2: Keyboard event listener not attached properly
+    function initializeKeyboardEvents() {
+      // BUG 2: Using wrong event type
+      document.addEventListener('keypress', handleKeyboard); // Should be 'keydown'
+      
+      console.log('Keyboard events initialized');
+    }
+    
+    function startDrawing(e) {
+      isDrawing = true;
+      [lastX, lastY] = getMousePos(e);
+      
+      // Save state for undo
+      saveCanvasState();
+      
+      logEvent('Mouse Down', `Tool: ${currentTool}, Position: (${lastX}, ${lastY})`);
+    }
+    
+    function draw(e) {
+      if (!isDrawing) return;
+      
+      const [currentX, currentY] = getMousePos(e);
+      
+      ctx.lineWidth = currentSize;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = currentColor;
+      
+      switch (currentTool) {
+        case 'pen':
+          drawLine(lastX, lastY, currentX, currentY);
+          break;
+        case 'eraser':
+          erase(currentX, currentY);
+          break;
+        case 'line':
+          // For line tool, we'd need to handle differently
+          drawLine(lastX, lastY, currentX, currentY);
+          break;
+        case 'circle':
+          // For circle tool, we'd need to handle differently
+          drawCircle(lastX, lastY, currentX, currentY);
+          break;
+      }
+      
+      [lastX, lastY] = [currentX, currentY];
+      
+      // BUG 5: Logging undefined values
+      logEvent('Mouse Move', `Position: (${x}, ${y})`); // Should be currentX, currentY
+    }
+    
+    function stopDrawing() {
+      if (!isDrawing) return;
+      isDrawing = false;
+      
+      logEvent('Mouse Up', 'Drawing stopped');
+    }
+    
+    function getMousePos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return [
+        e.clientX - rect.left,
+        e.clientY - rect.top
+      ];
+    }
+    
+    function drawLine(x1, y1, x2, y2) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+    
+    function drawCircle(x1, y1, x2, y2) {
+      const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+      ctx.beginPath();
+      ctx.arc(x1, y1, radius, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
+    
+    function erase(x, y) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(x, y, currentSize, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.restore();
+    }
+    
+    // BUG 3: Tool selection doesn't update button styles
+    function selectTool(tool) {
+      currentTool = tool;
+      
+      // BUG 3: Not removing active class from previous tool
+      const buttons = document.querySelectorAll('.toolbar button');
+      buttons.forEach(btn => btn.classList.remove('active-tool'));
+      
+      // BUG 3: Wrong element ID used
+      const activeButton = document.getElementById(tool + 'Tool'); // Should be toolName + 'Tool'
+      if (activeButton) {
+        activeButton.classList.add('active-tool');
+      }
+      
+      logEvent('Tool Selected', tool);
+      console.log('Tool selected:', tool);
+    }
+    
+    function updateBrushSize() {
+      const sizeSlider = document.getElementById('brushSize');
+      currentSize = sizeSlider.value;
+      document.getElementById('sizeDisplay').textContent = currentSize + 'px';
+      
+      logEvent('Brush Size Changed', currentSize + 'px');
+    }
+    
+    function updateColor() {
+      const colorPicker = document.getElementById('colorPicker');
+      currentColor = colorPicker.value;
+      
+      logEvent('Color Changed', currentColor);
+    }
+    
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawingHistory = [];
+      
+      logEvent('Canvas Cleared', 'All drawings removed');
+    }
+    
+    function saveCanvasState() {
+      drawingHistory.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+      
+      // Limit history to prevent memory issues
+      if (drawingHistory.length > 10) {
+        drawingHistory.shift();
+      }
+    }
+    
+    function undoLastAction() {
+      if (drawingHistory.length > 0) {
+        const previousState = drawingHistory.pop();
+        ctx.putImageData(previousState, 0, 0);
+        
+        logEvent('Undo', 'Last action undone');
+      } else {
+        logEvent('Undo Failed', 'No actions to undo');
+      }
+    }
+    
+    function saveDrawing() {
+      const link = document.createElement('a');
+      link.download = 'my-drawing.png';
+      link.href = canvas.toDataURL();
+      link.click();
+      
+      logEvent('Drawing Saved', 'Downloaded as PNG');
+    }
+    
+    // BUG 2: Keyboard event handler with wrong key detection
+    function handleKeyboard(e) {
+      // BUG 2: Using wrong property for key detection
+      const key = e.keyCode; // Should be e.key or e.code
+      
+      document.getElementById('currentKey').textContent = key;
+      
+      // BUG 2: Wrong key comparisons
+      switch (key) {
+        case 80: // Should be 'p' or 'P'
+          selectTool('pen');
+          break;
+        case 69: // Should be 'e' or 'E'
+          selectTool('eraser');
+          break;
+        case 76: // Should be 'l' or 'L'
+          selectTool('line');
+          break;
+        case 67: // Should be 'c' or 'C'
+          selectTool('circle');
+          break;
+        case 32: // Should be ' ' (space)
+          e.preventDefault();
+          clearCanvas();
+          break;
+      }
+      
+      // Handle Ctrl+Z for undo
+      if (e.ctrlKey && key === 90) { // Should be e.key === 'z'
+        e.preventDefault();
+        undoLastAction();
+      }
+      
+      logEvent('Key Pressed', key);
+    }
+    
+    function logEvent(eventType, details) {
+      const eventLog = document.getElementById('eventLog');
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = `[${timestamp}] ${eventType}: ${details}\n`;
+      
+      eventLog.textContent += logEntry;
+      eventLog.scrollTop = eventLog.scrollHeight;
+    }
+    
+    function clearEventLog() {
+      document.getElementById('eventLog').textContent = '';
+    }
+    
+    // Initialize the application
+    window.onload = function() {
+      initializeCanvas();
+      initializeKeyboardEvents();
+      
+      console.log('Drawing app loaded - Ready for debugging!');
+      console.log('Open Developer Tools (F12) to see debug messages');
+      console.log('Try drawing, using keyboard shortcuts, and watch for errors');
+      
+      logEvent('App Initialized', 'Drawing app ready');
+    };
+    
+    /*
+    🎯 DEBUGGING EXERCISES FOR STUDENTS:
+    
+    1. **Event Listeners**: Fix mouse and keyboard event attachment
+    2. **Event Properties**: Use correct event object properties
+    3. **Element Selection**: Fix ID-based element selection
+    4. **Event Propagation**: Handle mouse events properly
+    5. **Variable References**: Fix undefined variable usage
+    
+    🔧 EVENT HANDLING TECHNIQUES TO PRACTICE:
+    - addEventListener() vs onclick attributes
+    - Mouse events: mousedown, mousemove, mouseup, mouseout
+    - Keyboard events: keydown, keypress, keyup
+    - Event object properties: e.key, e.keyCode, e.clientX, e.clientY
+    - Event prevention: e.preventDefault()
+    - Event delegation and bubbling
+    - Canvas coordinate calculation
+    - State management in interactive applications
+    */
+  </script>
+</body>
+</html>

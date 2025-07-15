@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Calculator - Debug Challenge</title>
+  <style>
+    /* Clean, modern calculator styling */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .calculator-container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    
+    .debug-info {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #856404;
+    }
+    
+    .calculator {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #e9ecef;
+    }
+    
+    .display {
+      width: 100%;
+      height: 60px;
+      font-size: 24px;
+      text-align: right;
+      padding: 0 15px;
+      border: 2px solid #007bff;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background: #fff;
+      box-sizing: border-box;
+    }
+    
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    
+    button {
+      height: 50px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: bold;
+    }
+    
+    .number {
+      background: #e9ecef;
+      color: #333;
+    }
+    
+    .number:hover {
+      background: #dee2e6;
+    }
+    
+    .operator {
+      background: #007bff;
+      color: white;
+    }
+    
+    .operator:hover {
+      background: #0056b3;
+    }
+    
+    .equals {
+      background: #28a745;
+      color: white;
+    }
+    
+    .equals:hover {
+      background: #1e7e34;
+    }
+    
+    .clear {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .clear:hover {
+      background: #c82333;
+    }
+    
+    .debug-section {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+    }
+    
+    .debug-section h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+    
+    .bug-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    
+    .bug-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .bug-list li:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator-container">
+    <h1>🧮 JavaScript Calculator Debug Challenge</h1>
+    
+    <div class="debug-info">
+      <strong>🐛 Debugging Mission:</strong> This calculator has several bugs! Your job is to find and fix them using browser developer tools and debugging techniques.
+    </div>
+    
+    <div class="calculator">
+      <input type="text" id="display" class="display" readonly placeholder="0">
+      
+      <div class="buttons">
+        <!-- Row 1 -->
+        <button class="clear" onclick="clearDisplay()">C</button>
+        <button class="clear" onclick="deleteLast()">⌫</button>
+        <button class="operator" onclick="appendToDisplay('/')">/</button>
+        <button class="operator" onclick="appendToDisplay('*')">×</button>
+        
+        <!-- Row 2 -->
+        <button class="number" onclick="appendToDisplay('7')">7</button>
+        <button class="number" onclick="appendToDisplay('8')">8</button>
+        <button class="number" onclick="appendToDisplay('9')">9</button>
+        <button class="operator" onclick="appendToDisplay('-')">-</button>
+        
+        <!-- Row 3 -->
+        <button class="number" onclick="appendToDisplay('4')">4</button>
+        <button class="number" onclick="appendToDisplay('5')">5</button>
+        <button class="number" onclick="appendToDisplay('6')">6</button>
+        <button class="operator" onclick="appendToDisplay('+')">+</button>
+        
+        <!-- Row 4 -->
+        <button class="number" onclick="appendToDisplay('1')">1</button>
+        <button class="number" onclick="appendToDisplay('2')">2</button>
+        <button class="number" onclick="appendToDisplay('3')">3</button>
+        <button class="equals" onclick="calculateResult()" rowspan="2">=</button>
+        
+        <!-- Row 5 -->
+        <button class="number" onclick="appendToDisplay('0')" colspan="2">0</button>
+        <button class="number" onclick="appendToDisplay('.')">.</button>
+      </div>
+    </div>
+    
+    <div class="debug-section">
+      <h3>🔍 Bugs to Find & Fix:</h3>
+      <ul class="bug-list">
+        <li>🐛 <strong>Bug 1:</strong> Calculator doesn't show numbers when clicked</li>
+        <li>🐛 <strong>Bug 2:</strong> Division by zero crashes the calculator</li>
+        <li>🐛 <strong>Bug 3:</strong> Multiple decimal points allowed</li>
+        <li>🐛 <strong>Bug 4:</strong> Calculation result shows 'undefined'</li>
+        <li>🐛 <strong>Bug 5:</strong> Clear button doesn't work properly</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // INTENTIONAL BUGS FOR DEBUGGING PRACTICE
+    // Students need to find and fix these issues
+    
+    // Global variables to track calculator state
+    let currentInput = '';
+    let operator = '';
+    let previousInput = '';
+    let shouldResetDisplay = false;
+    
+    // BUG 1: Function name mismatch - function is called 'appendToDisplay' but defined as 'addToDisplay'
+    function addToDisplay(value) {
+      const display = document.getElementById('display');
+      
+      if (shouldResetDisplay) {
+        display.value = '';
+        shouldResetDisplay = false;
+      }
+      
+      // BUG 3: No validation for multiple decimal points
+      display.value += value;
+      currentInput = display.value;
+      
+      // Debug logging - students should use console to track values
+      console.log('Current input:', currentInput);
+    }
+    
+    // BUG 5: Clear function has wrong variable name
+    function clearDisplay() {
+      const display = document.getElementById('display');
+      display.value = '';
+      currentInput = '';
+      operator = '';
+      previousInput = '';
+      shouldResetDisplay = false;
+      
+      // This should clear the display but has a typo
+      wrongVariableName = ''; // This variable doesn't exist
+      
+      console.log('Calculator cleared');
+    }
+    
+    function deleteLast() {
+      const display = document.getElementById('display');
+      display.value = display.value.slice(0, -1);
+      currentInput = display.value;
+      
+      console.log('Deleted last character:', currentInput);
+    }
+    
+    // BUG 4: Function returns undefined instead of calculating
+    function calculateResult() {
+      const display = document.getElementById('display');
+      
+      if (currentInput === '' || operator === '' || previousInput === '') {
+        console.log('Incomplete calculation');
+        return; // Exit early if calculation is incomplete
+      }
+      
+      let result;
+      const prev = parseFloat(previousInput);
+      const current = parseFloat(currentInput);
+      
+      console.log('Calculating:', prev, operator, current);
+      
+      switch (operator) {
+        case '+':
+          result = prev + current;
+          break;
+        case '-':
+          result = prev - current;
+          break;
+        case '*':
+          result = prev * current;
+          break;
+        case '/':
+          // BUG 2: No check for division by zero
+          result = prev / current;
+          break;
+        default:
+          console.log('Unknown operator:', operator);
+          return;
+      }
+      
+      // BUG 4: Function doesn't return the result or update display
+      console.log('Result:', result);
+      // Missing: display.value = result;
+      // Missing: return result;
+      
+      // Reset for next calculation
+      currentInput = '';
+      operator = '';
+      previousInput = '';
+      shouldResetDisplay = true;
+    }
+    
+    // Function to handle operators
+    function handleOperator(op) {
+      if (currentInput === '') {
+        console.log('No number entered for operator');
+        return;
+      }
+      
+      if (previousInput !== '' && operator !== '' && currentInput !== '') {
+        calculateResult();
+      }
+      
+      operator = op;
+      previousInput = currentInput;
+      currentInput = '';
+      shouldResetDisplay = true;
+      
+      console.log('Operator set:', op, 'Previous:', previousInput);
+    }
+    
+    // Enhanced appendToDisplay function that should replace the buggy one
+    function appendToDisplayFixed(value) {
+      const display = document.getElementById('display');
+      
+      if (shouldResetDisplay) {
+        display.value = '';
+        shouldResetDisplay = false;
+      }
+      
+      // Fix for Bug 3: Prevent multiple decimal points
+      if (value === '.' && display.value.includes('.')) {
+        console.log('Decimal point already exists');
+        return;
+      }
+      
+      display.value += value;
+      currentInput = display.value;
+      
+      console.log('Current input:', currentInput);
+    }
+    
+    // Enhanced calculateResult function that actually works
+    function calculateResultFixed() {
+      const display = document.getElementById('display');
+      
+      if (currentInput === '' || operator === '' || previousInput === '') {
+        console.log('Incomplete calculation');
+        return;
+      }
+      
+      let result;
+      const prev = parseFloat(previousInput);
+      const current = parseFloat(currentInput);
+      
+      console.log('Calculating:', prev, operator, current);
+      
+      switch (operator) {
+        case '+':
+          result = prev + current;
+          break;
+        case '-':
+          result = prev - current;
+          break;
+        case '*':
+          result = prev * current;
+          break;
+        case '/':
+          // Fix for Bug 2: Check for division by zero
+          if (current === 0) {
+            alert('Error: Cannot divide by zero!');
+            console.log('Division by zero attempted');
+            return;
+          }
+          result = prev / current;
+          break;
+        default:
+          console.log('Unknown operator:', operator);
+          return;
+      }
+      
+      // Fix for Bug 4: Actually update the display and return result
+      display.value = result;
+      console.log('Result:', result);
+      
+      // Reset for next calculation
+      currentInput = result.toString();
+      operator = '';
+      previousInput = '';
+      shouldResetDisplay = true;
+      
+      return result;
+    }
+    
+    // Initialize calculator
+    window.onload = function() {
+      console.log('Calculator loaded - Ready for debugging!');
+      console.log('Open Developer Tools (F12) to see debug messages');
+      console.log('Try using the calculator and watch for errors in the console');
+    };
+    
+    /*
+    🎯 DEBUGGING EXERCISES FOR STUDENTS:
+    
+    1. **Console Debugging**: Open browser DevTools (F12) and watch console messages
+    2. **Function Name Bug**: Fix the mismatch between function call and definition
+    3. **Division by Zero**: Add proper error handling for division by zero
+    4. **Multiple Decimals**: Prevent users from entering multiple decimal points
+    5. **Undefined Results**: Fix the calculateResult function to actually show results
+    6. **Variable Errors**: Fix undefined variable references
+    
+    🔧 DEBUGGING TECHNIQUES TO PRACTICE:
+    - Using console.log() to track variable values
+    - Reading error messages in the console
+    - Using browser breakpoints
+    - Step-by-step code execution
+    - Identifying function call mismatches
+    - Validating user input
+    - Error handling with try-catch (advanced)
+    */
+  </script>
+</body>
+</html>
